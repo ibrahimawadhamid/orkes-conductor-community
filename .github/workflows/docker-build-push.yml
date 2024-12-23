@@ -40,3 +40,5 @@ jobs:
             ghcr.io/${{ github.repository }}:latest
             ghcr.io/${{ github.repository }}:${{ github.sha }}
           platforms: linux/amd64,linux/arm64
+          cache-to: type=inline
+          remove: true
