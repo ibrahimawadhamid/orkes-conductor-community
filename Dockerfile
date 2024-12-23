@@ -16,11 +16,24 @@ RUN ./gradlew clean build -x test && echo "Done building Server"
 # 1. Runtime stage
 # ===========================================================================================================
 
-FROM alpine:3.18 AS runner
+# Stage 2: Runtime stage with platform-specific adjustments
+FROM --platform=$TARGETPLATFORM alpine:3.18 AS runtime
 LABEL maintainer="Ibrahim Awad <ibrahim.a.hamid@gmail.com>"
 
-RUN apk add --no-cache coreutils curl openjdk17 && rm -rf /var/cache/apk/* \
-	&& mkdir -p /app/config /app/logs /app/libs /app/info
+# ARG to detect platform during build
+ARG TARGETPLATFORM
+
+# Default environment
+ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk
+ENV PATH="${JAVA_HOME}/bin:${PATH}"
+
+# Install OpenJDK for supported platforms
+RUN if [ "$TARGETPLATFORM" = "linux/amd64" ] || [ "$TARGETPLATFORM" = "linux/arm64" ]; then \
+        apk add --no-cache coreutils curl openjdk17-jre-base && \
+        mkdir -p /app/config /app/logs /app/libs /app/info; \
+    else \
+        echo "Unsupported platform for openjdk17 on Alpine"; exit 1; \
+    fi
 
 COPY ./docker/config/startup.sh /app/startup.sh
 COPY ./docker/config/config.properties /app/config/config.properties
