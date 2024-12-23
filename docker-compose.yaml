@@ -23,8 +23,7 @@ services:
 
   orkes-server:
     container_name: orkes-server
-    build:
-      context: .
+    image: ghcr.io/ibrahimawadhamid/orkes-conductor-community:latest
     environment:
       - spring.datasource.url=jdbc:postgresql://postgresql:5432/postgres
       - conductor.redis-lock.serverAddress=redis://redis:6379
