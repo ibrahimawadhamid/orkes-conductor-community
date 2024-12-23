@@ -5,12 +5,10 @@
 # 0. Builder stage
 # ===========================================================================================================
 
-FROM alpine:3.18 AS builder
+FROM eclipse-temurin:17-jdk AS builder
 LABEL maintainer="Ibrahim Awad <ibrahim.a.hamid@gmail.com>"
 
 COPY . /app
-RUN apk add openjdk17
-
 WORKDIR /app
 RUN ./gradlew clean build -x test && echo "Done building Server"
 
@@ -21,7 +19,7 @@ RUN ./gradlew clean build -x test && echo "Done building Server"
 FROM alpine:3.18 AS runner
 LABEL maintainer="Ibrahim Awad <ibrahim.a.hamid@gmail.com>"
 
-RUN apk add --no-cache coreutils curl nginx openjdk17 && rm -rf /var/cache/apk/* \
+RUN apk add --no-cache coreutils curl openjdk17 && rm -rf /var/cache/apk/* \
 	&& mkdir -p /app/config /app/logs /app/libs /app/info
 
 COPY ./docker/config/startup.sh /app/startup.sh
